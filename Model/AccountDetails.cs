@@ -7,7 +7,7 @@ namespace worksheet2.Model
     {
         [Key] [ForeignKey("User")] public string UserAccountDetailsId { get; set; }
 
-        public  virtual User User { get; set; }
+        public  User User { get; set; }
 
         public long Balance { get; set; }
         public AccountType AccountType { get; set; }

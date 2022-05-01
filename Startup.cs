@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +13,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using worksheet2.Authentication;
 using worksheet2.Data;
+using worksheet2.Model.Settings;
+using worksheet2.Services;
+using worksheet2.Services.Impl;
 
 namespace worksheet2
 {
@@ -23,15 +28,23 @@ namespace worksheet2
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var appSettings = Configuration
+                .GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettings);
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountDetailsService, AccountDetailService>();
             services.AddDbContext<BankContext>(
                 options => options.UseMySQL(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(
+                    options => 
+                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "worksheet2", Version = "v1"});
@@ -53,6 +66,8 @@ namespace worksheet2
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

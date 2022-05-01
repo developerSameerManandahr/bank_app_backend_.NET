@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Web.Helpers;
 using worksheet2.Model;
 
 namespace worksheet2.Data
@@ -15,22 +16,37 @@ namespace worksheet2.Data
                 return; // DB has been seeded
             }
 
-            var users = new User[]
+            var user = new User
             {
-                new User
-                {
-                    UserId = "1",
-                    UserName = "root",
-                    Password = "root",
-                    Pin = 1234,
-                    AccountNumber = "0123456789"
-                }
+                UserId = "1",
+                UserName = "root",
+                Password = Crypto.HashPassword("root"), //var verifyPassword = Crypto.VerifyHashedPassword(hash, "root");
+                Pin = Crypto.HashPassword("1234"),
+                AccountNumber = "0123456789"
             };
 
-            foreach (var user in users)
+            var accountDetails = new AccountDetails
             {
-                context.Users.Add(user);
-            }
+                Balance = 1000000000,
+                Currency = "GBP",
+                User = user,
+                AccountType = AccountType.PREMIUM
+            };
+
+            var userDetails = new UserDetails
+            {
+                User = user,
+                FirstName = "Ussop",
+                LastName = "God",
+                MiddleName = "sogeking",
+                UserUserDetailsId = "1",
+                Address = "Home",
+                PhoneNumber = 1111111111
+            };
+
+            context.Users.Add(user);
+            context.AccountDetails.Add(accountDetails);
+            context.UserDetails.Add(userDetails);
 
             context.SaveChanges();
         }

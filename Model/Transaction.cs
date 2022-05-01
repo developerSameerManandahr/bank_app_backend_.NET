@@ -12,7 +12,8 @@ namespace worksheet2.Model
         public virtual User User { get; set; }
         public string FromUserId { get; set; }
         public string ToUserId { get; set; }
+        public string Description { get; set; }
         public long Amount { get; set; }
-        public DateTime  TransactionDate { get; set; }
+        public DateTime TransactionDate { get; set; }
     }
 }

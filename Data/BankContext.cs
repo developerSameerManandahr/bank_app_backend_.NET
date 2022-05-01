@@ -18,30 +18,63 @@ namespace worksheet2.Data
             ModelBuilder modelBuilder
         )
         {
+            MakePrimaryKeyAutoIncrement(modelBuilder);
+
+            MakeFieldsUnique(modelBuilder);
+
+            ManageRelationShip(modelBuilder);
+        }
+
+        private static void ManageRelationShip(ModelBuilder modelBuilder)
+        {
             modelBuilder
                 .Entity<User>()
                 .HasOne(u => u.AccountDetails)
-                .WithOne(details => details.User);
-            
+                .WithOne(details => details.User)
+                .HasForeignKey<AccountDetails>();
+
             modelBuilder
                 .Entity<User>()
                 .HasOne(u => u.UserDetails)
-                .WithOne(details => details.User);
-            
+                .WithOne(details => details.User)
+                .HasForeignKey<UserDetails>();
+
             modelBuilder
                 .Entity<User>()
                 .HasMany(u => u.Transactions)
                 .WithOne(details => details.User);
+        }
+
+        private static void MakeFieldsUnique(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<User>()
+                .HasIndex(user => user.UserName)
+                .IsUnique();
+
+            modelBuilder
+                .Entity<User>()
+                .HasIndex(user => user.AccountNumber)
+                .IsUnique();
+        }
+
+        private static void MakePrimaryKeyAutoIncrement(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<User>()
-                .ToTable(nameof(Users));
+                .Property(u => u.UserId)
+                .ValueGeneratedOnAdd();
+            
             modelBuilder.Entity<UserDetails>()
-                .ToTable(nameof(UserDetails));
+                .Property(u => u.UserUserDetailsId)
+                .ValueGeneratedOnAdd();
+            
             modelBuilder.Entity<Transaction>()
-                .ToTable(nameof(Transactions))
-                .HasOne<User>();
+                .Property(t => t.UserTransactionId)
+                .ValueGeneratedOnAdd();
+            
             modelBuilder.Entity<AccountDetails>()
-                .ToTable(nameof(AccountDetails))
-                .HasOne<User>();
+                .Property(ac => ac.UserAccountDetailsId)
+                .ValueGeneratedOnAdd();
         }
     }
 }
