@@ -5,7 +5,8 @@ namespace worksheet2.Model
 {
     public class AccountDetails
     {
-        [Key] [ForeignKey("User")] public string UserAccountDetailsId { get; set; }
+        [Key] 
+        public string UserAccountDetailsId { get; set; }
 
         public  User User { get; set; }
 

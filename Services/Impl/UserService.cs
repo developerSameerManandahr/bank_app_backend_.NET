@@ -85,9 +85,11 @@ namespace worksheet2.Services.Impl
             };
             _context.UserDetails
                 .Add(userDetails);
-            _context.SaveChanges();
 
+            CreateAccountDetails(createdUser, AccountType.CURRENT);
             CreateAccountDetails(createdUser, AccountType.SAVING);
+
+            _context.SaveChanges();
 
             return new BaseResponse(
                 "Signup Successful",
@@ -95,18 +97,22 @@ namespace worksheet2.Services.Impl
             );
         }
 
-        private void CreateAccountDetails(User createdUser, AccountType accountType)
+        public AccountDetails CreateAccountDetails(User createdUser, AccountType accountType)
         {
+            var accountDetails = new AccountDetails()
+            {
+                Balance = 0,
+                Currency = "GBP",
+                User = createdUser,
+                AccountType = accountType,
+            };
             _context.AccountDetails
-                .Add(new AccountDetails()
-                {
-                    Balance = 0,
-                    Currency = "GBP",
-                    User = createdUser,
-                    AccountType = accountType
-                });
+                .Add(accountDetails);
+
             _context.SaveChanges();
 
+            _context.Entry(accountDetails).State = EntityState.Detached;
+            return _context.AccountDetails.FirstOrDefault(details => details.User == createdUser);
         }
 
         public IEnumerable<User> GetAll()
@@ -154,6 +160,15 @@ namespace worksheet2.Services.Impl
             {
                 return GenerateAccount(length);
             }
+        }
+
+        private static Random random = new Random();
+
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

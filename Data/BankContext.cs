@@ -27,11 +27,15 @@ namespace worksheet2.Data
 
         private static void ManageRelationShip(ModelBuilder modelBuilder)
         {
+            // modelBuilder
+            //     .Entity<User>()
+            //     .HasOne(u => u.AccountDetails)
+            //     .WithOne(details => details.User)
+            //     .HasForeignKey<AccountDetails>();
+
             modelBuilder
                 .Entity<User>()
-                .HasOne(u => u.AccountDetails)
-                .WithOne(details => details.User)
-                .HasForeignKey<AccountDetails>();
+                .HasMany<AccountDetails>(user => user.AccountDetails);
 
             modelBuilder
                 .Entity<User>()
@@ -56,6 +60,11 @@ namespace worksheet2.Data
                 .Entity<User>()
                 .HasIndex(user => user.AccountNumber)
                 .IsUnique();
+            
+            modelBuilder
+                .Entity<AccountDetails>()
+                .HasIndex(details =>  details.UserAccountDetailsId)
+                .IsUnique();
         }
 
         private static void MakePrimaryKeyAutoIncrement(ModelBuilder modelBuilder)
@@ -63,15 +72,15 @@ namespace worksheet2.Data
             modelBuilder.Entity<User>()
                 .Property(u => u.UserId)
                 .ValueGeneratedOnAdd();
-            
+
             modelBuilder.Entity<UserDetails>()
                 .Property(u => u.UserUserDetailsId)
                 .ValueGeneratedOnAdd();
-            
+
             modelBuilder.Entity<Transaction>()
                 .Property(t => t.UserTransactionId)
                 .ValueGeneratedOnAdd();
-            
+
             modelBuilder.Entity<AccountDetails>()
                 .Property(ac => ac.UserAccountDetailsId)
                 .ValueGeneratedOnAdd();

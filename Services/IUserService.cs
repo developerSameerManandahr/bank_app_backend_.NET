@@ -13,6 +13,8 @@ namespace worksheet2.Services
         
         BaseResponse SignUp(SignupRequest request);
 
+        AccountDetails CreateAccountDetails(User createdUser, AccountType accountType);
+
         IEnumerable<User> GetAll();
 
         User GetById(string id);

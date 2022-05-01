@@ -38,13 +38,18 @@ namespace worksheet2
             services.Configure<AppSettings>(appSettings);
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountDetailsService, AccountDetailService>();
+            services.AddScoped<IPayService, PayService>();
             services.AddDbContext<BankContext>(
                 options => options.UseMySQL(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers()
                 .AddJsonOptions(
-                    options => 
-                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+                    options =>
+                    {
+                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "worksheet2", Version = "v1"});

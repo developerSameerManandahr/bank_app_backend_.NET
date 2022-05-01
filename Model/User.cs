@@ -25,7 +25,7 @@ namespace worksheet2.Model
         public DateTime CreatedDate { get; set; }
 
         public virtual UserDetails UserDetails { get; set; }
-        public virtual AccountDetails AccountDetails { get; set; }
+        public virtual List<AccountDetails>  AccountDetails { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; }
     }
 }
