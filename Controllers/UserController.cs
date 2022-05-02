@@ -23,7 +23,6 @@ namespace worksheet2.Controllers
         [Authorize]
         public IActionResult Authenticate()
         {
-            var httpContextItem = HttpContext.Items["User"];
             var response = _userService.GetAll();
 
             return Ok(response);

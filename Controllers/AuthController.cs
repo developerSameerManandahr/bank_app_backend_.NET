@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using worksheet2.Model;
 using worksheet2.Model.Request;
 using worksheet2.Services;
 
@@ -45,6 +46,16 @@ namespace worksheet2.Controllers
 
             if (response == null)
                 return BadRequest(new {message = "Username or password is incorrect"});
+
+            return Ok(response);
+        }
+        
+        [HttpPost("verify/pin")]
+        public IActionResult VerifyPin(VerifyPinRequest model)
+        {
+            var user = (User) HttpContext.Items["User"];
+            
+            var response = _userService.VerifyPin(model, user);
 
             return Ok(response);
         }

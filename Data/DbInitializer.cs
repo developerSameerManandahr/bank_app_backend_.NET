@@ -41,7 +41,7 @@ namespace worksheet2.Data
                 MiddleName = "sogeking",
                 UserUserDetailsId = "1",
                 Address = "Home",
-                PhoneNumber = 1111111111
+                PhoneNumber = "1111111111"
             };
 
             context.Users.Add(user);

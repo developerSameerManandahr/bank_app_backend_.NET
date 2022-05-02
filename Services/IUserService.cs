@@ -10,6 +10,7 @@ namespace worksheet2.Services
         AuthenticationResponse Authenticate(AuthenticateRequest request);
         
         AuthenticationResponse AuthenticateByPin(AuthenticatePinRequest request);
+        BaseResponse VerifyPin(VerifyPinRequest request, User user);
         
         BaseResponse SignUp(SignupRequest request);
 

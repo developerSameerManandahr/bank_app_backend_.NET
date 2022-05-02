@@ -63,6 +63,20 @@ namespace worksheet2.Services.Impl
             return new AuthenticationResponse(user, token);
         }
 
+        public BaseResponse VerifyPin(VerifyPinRequest verifyPinRequest, User user)
+        {
+            var userFromContext = this._context
+                .Users
+                .FirstOrDefault(user1 => user1.UserId == user.UserId);
+
+            if (userFromContext != null && Crypto.VerifyHashedPassword(userFromContext.Pin, verifyPinRequest.pin))
+            {
+                return new BaseResponse("PIN is correct", "Success");
+            }
+
+            return new BaseResponse("PIN is incorrect", "Error");
+        }
+
         public BaseResponse SignUp(SignupRequest request)
         {
             var user = new User()
@@ -81,7 +95,8 @@ namespace worksheet2.Services.Impl
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 MiddleName = request.MiddleName,
-                User = createdUser
+                User = createdUser,
+                PhoneNumber = request.PhoneNumber
             };
             _context.UserDetails
                 .Add(userDetails);

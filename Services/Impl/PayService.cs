@@ -26,7 +26,7 @@ namespace worksheet2.Services.Impl
         public BaseResponse pay(PayRequest payRequest, User fromUser)
         {
             var user = _context.Users
-                .FirstOrDefault(user => user.UserName == payRequest.to);
+                .FirstOrDefault(user => user.UserName == payRequest.To);
             var fromAccountDetails = _context.AccountDetails
                 .FirstOrDefault(details => details.User == fromUser && (details.AccountType == AccountType.CURRENT ||
                                                                           details.AccountType == AccountType.PREMIUM));
@@ -84,10 +84,10 @@ namespace worksheet2.Services.Impl
         private void TransferMoney(PayRequest payRequest, AccountDetails toAccountDetails,
             AccountDetails fromAccountDetails)
         {
-            toAccountDetails.Balance += payRequest.amount;
+            toAccountDetails.Balance += payRequest.Amount;
             if (fromAccountDetails != null)
             {
-                fromAccountDetails.Balance -= payRequest.amount;
+                fromAccountDetails.Balance -= payRequest.Amount;
                 _context.AccountDetails.Update(fromAccountDetails);
             }
         }
@@ -99,7 +99,7 @@ namespace worksheet2.Services.Impl
                 {
                     FromUserId = fromUser.UserId,
                     ToUserId = user.UserId,
-                    Amount = payRequest.amount,
+                    Amount = payRequest.Amount,
                     Description = "transferred",
                     User = fromUser,
                     TransactionDate = DateTime.Now

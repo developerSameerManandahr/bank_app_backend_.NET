@@ -2,7 +2,7 @@
 {
     public class PayRequest
     {
-        public string to { get; set; }
-        public long amount { get; set; }
+        public string To { get; set; }
+        public long Amount { get; set; }
     }
 }
