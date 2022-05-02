@@ -24,6 +24,9 @@ namespace worksheet2.Authentication
             _appSettings = appSettings.Value;
         }
 
+        /**
+         * checks the token and attach user to context
+         */
         public async Task Invoke(HttpContext context, IUserService userService)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();

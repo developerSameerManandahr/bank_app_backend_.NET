@@ -27,12 +27,6 @@ namespace worksheet2.Data
 
         private static void ManageRelationShip(ModelBuilder modelBuilder)
         {
-            // modelBuilder
-            //     .Entity<User>()
-            //     .HasOne(u => u.AccountDetails)
-            //     .WithOne(details => details.User)
-            //     .HasForeignKey<AccountDetails>();
-
             modelBuilder
                 .Entity<User>()
                 .HasMany<AccountDetails>(user => user.AccountDetails);

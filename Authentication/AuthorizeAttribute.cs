@@ -6,6 +6,10 @@ using worksheet2.Model;
 
 namespace worksheet2.Authentication
 {
+    /**
+     * Checks the controller methods that have [Authorize] appended before method
+     * Checks if the token is valid by checking the user from the context
+     */
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {

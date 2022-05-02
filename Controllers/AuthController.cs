@@ -10,17 +10,20 @@ namespace worksheet2.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly IAuthenticationService _authenticationService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IAuthenticationService authenticationService)
         {
-            _userService = userService;
+            _authenticationService = authenticationService;
         }
 
+        /**
+         * Used to login by username
+         */
         [HttpPost("login/username")]
         public IActionResult AuthenticateByPassword(AuthenticateRequest model)
         {
-            var response = _userService.Authenticate(model);
+            var response = _authenticationService.Authenticate(model);
 
             if (response == null)
                 return BadRequest(new {message = "Username or password is incorrect"});
@@ -28,10 +31,13 @@ namespace worksheet2.Controllers
             return Ok(response);
         }
 
+        /**
+         * Used to login by accountNumber
+         */
         [HttpPost("login/accountNumber")]
         public IActionResult AuthenticateByPin(AuthenticatePinRequest request)
         {
-            var response = _userService.AuthenticateByPin(request);
+            var response = _authenticationService.AuthenticateByPin(request);
 
             if (response == null)
                 return BadRequest(new {message = "Pin or Account Number is incorrect"});
@@ -39,10 +45,13 @@ namespace worksheet2.Controllers
             return Ok(response);
         }
 
+        /**
+         * Used to signup 
+         */
         [HttpPost("signup")]
         public IActionResult SignUp(SignupRequest model)
         {
-            var response = _userService.SignUp(model);
+            var response = _authenticationService.SignUp(model);
 
             if (response == null)
                 return BadRequest(new {message = "Username or password is incorrect"});
@@ -50,17 +59,24 @@ namespace worksheet2.Controllers
             return Ok(response);
         }
         
+        
+        /**
+         * Used to verify the pin 
+         */
         [HttpPost("verify/pin")]
         public IActionResult VerifyPin(VerifyPinRequest model)
         {
             var user = (User) HttpContext.Items["User"];
             
-            var response = _userService.VerifyPin(model, user);
+            var response = _authenticationService.VerifyPin(model, user);
 
             return Ok(response);
         }
 
 
+        /**
+         * Used to logout 
+         */
         [HttpPost("logout")]
         public IActionResult Logout()
         {

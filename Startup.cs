@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using worksheet2.Authentication;
 using worksheet2.Data;
+using worksheet2.Model.Response;
 using worksheet2.Model.Settings;
 using worksheet2.Services;
 using worksheet2.Services.Impl;
@@ -36,8 +37,10 @@ namespace worksheet2
             var appSettings = Configuration
                 .GetSection("AppSettings");
             services.Configure<AppSettings>(appSettings);
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountDetailsService, AccountDetailService>();
+            services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPayService, PayService>();
             services.AddDbContext<BankContext>(
                 options => options.UseMySQL(

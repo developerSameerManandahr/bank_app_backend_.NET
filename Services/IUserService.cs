@@ -7,13 +7,7 @@ namespace worksheet2.Services
 {
     public interface IUserService
     {
-        AuthenticationResponse Authenticate(AuthenticateRequest request);
         
-        AuthenticationResponse AuthenticateByPin(AuthenticatePinRequest request);
-        BaseResponse VerifyPin(VerifyPinRequest request, User user);
-        
-        BaseResponse SignUp(SignupRequest request);
-
         AccountDetails CreateAccountDetails(User createdUser, AccountType accountType);
 
         IEnumerable<User> GetAll();
