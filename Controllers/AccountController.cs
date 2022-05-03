@@ -3,7 +3,6 @@ using worksheet2.Authentication;
 using worksheet2.Model;
 using worksheet2.Services;
 
-
 namespace worksheet2.Controllers
 {
     [ApiController]
@@ -14,17 +13,17 @@ namespace worksheet2.Controllers
 
         public AccountController(IAccountDetailsService accountDetailsService)
         {
-            this._accountDetailsService = accountDetailsService;
+            _accountDetailsService = accountDetailsService;
         }
 
-        [HttpGet("accountDetails")]
+        [HttpGet("Details")]
         [Authorize]
         public IActionResult GetAccountDetails()
         {
             var user = (User) HttpContext.Items["User"];
             if (user == null) return BadRequest(new {message = "Bad Token"});
             var response = _accountDetailsService
-                .getAccountDetailsResponsesById(user);
+                .GetAccountDetailsResponsesById(user);
 
             return Ok(response);
         }

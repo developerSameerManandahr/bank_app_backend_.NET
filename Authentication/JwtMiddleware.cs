@@ -13,8 +13,8 @@ namespace worksheet2.Authentication
 {
     public class JwtMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly AppSettings _appSettings;
+        private readonly RequestDelegate _next;
 
         public JwtMiddleware(
             RequestDelegate next,
@@ -51,10 +51,10 @@ namespace worksheet2.Authentication
                     ValidateAudience = false,
 
                     ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
+                }, out var validatedToken);
 
                 var jwtToken = (JwtSecurityToken) validatedToken;
-                var userId = (jwtToken.Claims.First(x => x.Type == "id").Value);
+                var userId = jwtToken.Claims.First(x => x.Type == "id").Value;
 
                 // attach user to context on successful jwt validation
                 context.Items["User"] = userService.GetById(userId);

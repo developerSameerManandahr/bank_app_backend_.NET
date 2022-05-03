@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using worksheet2.Authentication;
-using worksheet2.Model;
-using worksheet2.Model.Request;
 using worksheet2.Services;
-
 
 namespace worksheet2.Controllers
 {
@@ -12,14 +8,14 @@ namespace worksheet2.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly IUserService _userService;
 
         public UserController(IUserService userService)
         {
             _userService = userService;
         }
 
-        [HttpGet("userDetails")]
+        [HttpGet("details")]
         [Authorize]
         public IActionResult Authenticate()
         {

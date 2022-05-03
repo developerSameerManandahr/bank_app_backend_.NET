@@ -11,16 +11,14 @@ namespace worksheet2.Data
             context.Database.EnsureCreated();
 
             // Look for any users.
-            if (context.Users.Any())
-            {
-                return; // DB has been seeded
-            }
+            if (context.Users.Any()) return; // Data are already been inserted
 
             var user = new User
             {
                 UserId = "1",
                 UserName = "root",
-                Password = Crypto.HashPassword("root"), //var verifyPassword = Crypto.VerifyHashedPassword(hash, "root");
+                Password = Crypto
+                    .HashPassword("root"), //var verifyPassword = Crypto.VerifyHashedPassword(hash, "root");
                 Pin = Crypto.HashPassword("1234"),
                 AccountNumber = "0123456789"
             };

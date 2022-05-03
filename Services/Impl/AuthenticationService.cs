@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -18,17 +17,16 @@ namespace worksheet2.Services.Impl
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly BankContext _context;
-
         private readonly AppSettings _appSettings;
+        private readonly BankContext _context;
 
         public AuthenticationService(
             BankContext context,
             IOptions<AppSettings> appOptions
         )
         {
-            this._context = context;
-            this._appSettings = appOptions.Value;
+            _context = context;
+            _appSettings = appOptions.Value;
         }
 
         public AuthenticationResponse Authenticate(AuthenticateRequest request)
@@ -37,10 +35,7 @@ namespace worksheet2.Services.Impl
                 .Include(u => u.UserDetails)
                 .FirstOrDefault(user => user.UserName == request.Username);
 
-            if (user == null || !Crypto.VerifyHashedPassword(user.Password, request.Password))
-            {
-                return null;
-            }
+            if (user == null || !Crypto.VerifyHashedPassword(user.Password, request.Password)) return null;
 
             var token = GenerateJwtToken(user);
 
@@ -53,10 +48,7 @@ namespace worksheet2.Services.Impl
                 .Include(u => u.UserDetails)
                 .FirstOrDefault(user => user.AccountNumber == request.AccountNumber);
 
-            if (user == null || !Crypto.VerifyHashedPassword(user.Pin, request.Pin))
-            {
-                return null;
-            }
+            if (user == null || !Crypto.VerifyHashedPassword(user.Pin, request.Pin)) return null;
 
             var token = GenerateJwtToken(user);
 
@@ -65,21 +57,19 @@ namespace worksheet2.Services.Impl
 
         public BaseResponse VerifyPin(VerifyPinRequest verifyPinRequest, User user)
         {
-            var userFromContext = this._context
+            var userFromContext = _context
                 .Users
                 .FirstOrDefault(user1 => user1.UserId == user.UserId);
 
-            if (userFromContext != null && Crypto.VerifyHashedPassword(userFromContext.Pin, verifyPinRequest.pin))
-            {
+            if (userFromContext != null && Crypto.VerifyHashedPassword(userFromContext.Pin, verifyPinRequest.Pin))
                 return new BaseResponse("PIN is correct", "Success");
-            }
 
             return new BaseResponse("PIN is incorrect", "Error");
         }
 
         public BaseResponse SignUp(SignupRequest request)
         {
-            var user = new User()
+            var user = new User
             {
                 Password = Crypto.HashPassword(request.Password),
                 Pin = Crypto.HashPassword(request.Pin),
@@ -89,7 +79,7 @@ namespace worksheet2.Services.Impl
             var userEntry = _context.Users
                 .Add(user);
             var createdUser = userEntry.Entity;
-            var userDetails = new UserDetails()
+            var userDetails = new UserDetails
             {
                 Address = request.Address,
                 FirstName = request.FirstName,
@@ -112,14 +102,14 @@ namespace worksheet2.Services.Impl
             );
         }
 
-        public AccountDetails CreateAccountDetails(User createdUser, AccountType accountType)
+        private void CreateAccountDetails(User createdUser, AccountType accountType)
         {
-            var accountDetails = new AccountDetails()
+            var accountDetails = new AccountDetails
             {
                 Balance = 0,
                 Currency = "GBP",
                 User = createdUser,
-                AccountType = accountType,
+                AccountType = accountType
             };
             _context.AccountDetails
                 .Add(accountDetails);
@@ -127,7 +117,6 @@ namespace worksheet2.Services.Impl
             _context.SaveChanges();
 
             _context.Entry(accountDetails).State = EntityState.Detached;
-            return _context.AccountDetails.FirstOrDefault(details => details.User == createdUser);
         }
 
 
@@ -155,13 +144,8 @@ namespace worksheet2.Services.Impl
             var user = _context.Users
                 .FirstOrDefault(user => user.AccountNumber == accountNumber);
             if (user == null)
-            {
                 return accountNumber;
-            }
-            else
-            {
-                return GenerateAccount(length);
-            }
+            return GenerateAccount(length);
         }
     }
 }

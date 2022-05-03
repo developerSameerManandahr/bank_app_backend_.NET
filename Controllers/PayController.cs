@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using worksheet2.Authentication;
 using worksheet2.Model;
 using worksheet2.Model.Request;
 using worksheet2.Services;
-
 
 namespace worksheet2.Controllers
 {
@@ -12,7 +10,7 @@ namespace worksheet2.Controllers
     [Route("[controller]")]
     public class PayController : ControllerBase
     {
-        private IPayService _payService;
+        private readonly IPayService _payService;
 
         public PayController(IPayService payService)
         {
@@ -24,7 +22,7 @@ namespace worksheet2.Controllers
         public IActionResult PaySomeone(PayRequest payRequest)
         {
             var user = (User) HttpContext.Items["User"];
-            var response = _payService.pay(payRequest, user);
+            var response = _payService.Pay(payRequest, user);
 
             return Ok(response);
         }
@@ -34,8 +32,7 @@ namespace worksheet2.Controllers
         public IActionResult ManageFund(ManageFundRequest manageFundRequest)
         {
             var user = (User) HttpContext.Items["User"];
-            var response = _payService.manageFund(manageFundRequest, user);
-
+            var response = _payService.ManageFund(manageFundRequest, user);
             return Ok(response);
         }
     }

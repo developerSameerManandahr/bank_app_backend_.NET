@@ -12,6 +12,7 @@ namespace worksheet2.Model.Request
         [MinLength(6)]
         [MaxLength(6)]
         [RegularExpression("^[0-9]+$")]
-        [Required] public string Pin { get; set; }
+        [Required]
+        public string Pin { get; set; }
     }
 }

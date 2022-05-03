@@ -3,7 +3,6 @@ using worksheet2.Authentication;
 using worksheet2.Model;
 using worksheet2.Services;
 
-
 namespace worksheet2.Controllers
 {
     [ApiController]
@@ -17,7 +16,7 @@ namespace worksheet2.Controllers
             _transactionService = transactionService;
         }
 
-        [HttpGet("transactions")]
+        [HttpGet("view")]
         [Authorize]
         public IActionResult Authenticate()
         {

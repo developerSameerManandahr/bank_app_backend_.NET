@@ -2,6 +2,6 @@
 {
     public class VerifyPinRequest
     {
-        public string pin { get; set; }
+        public string Pin { get; set; }
     }
 }

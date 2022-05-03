@@ -1,40 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Web.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using worksheet2.Data;
 using worksheet2.Model;
-using worksheet2.Model.Request;
-using worksheet2.Model.Response;
-using worksheet2.Model.Settings;
 
 namespace worksheet2.Services.Impl
 {
     public class UserService : IUserService
     {
         private readonly BankContext _context;
-        
+
         public UserService(
             BankContext context
         )
         {
-            this._context = context;
+            _context = context;
         }
 
         public AccountDetails CreateAccountDetails(User createdUser, AccountType accountType)
         {
-            var accountDetails = new AccountDetails()
+            var accountDetails = new AccountDetails
             {
                 Balance = 0,
                 Currency = "GBP",
                 User = createdUser,
-                AccountType = accountType,
+                AccountType = accountType
             };
             _context.AccountDetails
                 .Add(accountDetails);

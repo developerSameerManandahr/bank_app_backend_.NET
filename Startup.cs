@@ -1,21 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using worksheet2.Authentication;
 using worksheet2.Data;
-using worksheet2.Model.Response;
 using worksheet2.Model.Settings;
 using worksheet2.Services;
 using worksheet2.Services.Impl;
@@ -36,12 +28,15 @@ namespace worksheet2
         {
             var appSettings = Configuration
                 .GetSection("AppSettings");
+
+            services.AddMemoryCache();
             services.Configure<AppSettings>(appSettings);
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountDetailsService, AccountDetailService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPayService, PayService>();
+            services.AddScoped<ICurrencyRateService, CurrencyRateService>();
             services.AddDbContext<BankContext>(
                 options => options.UseMySQL(
                     Configuration.GetConnectionString("DefaultConnection")));

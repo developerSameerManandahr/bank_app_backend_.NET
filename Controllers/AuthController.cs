@@ -3,7 +3,6 @@ using worksheet2.Model;
 using worksheet2.Model.Request;
 using worksheet2.Services;
 
-
 namespace worksheet2.Controllers
 {
     [ApiController]
@@ -46,7 +45,7 @@ namespace worksheet2.Controllers
         }
 
         /**
-         * Used to signup 
+         * Used to signup
          */
         [HttpPost("signup")]
         public IActionResult SignUp(SignupRequest model)
@@ -58,16 +57,16 @@ namespace worksheet2.Controllers
 
             return Ok(response);
         }
-        
-        
+
+
         /**
-         * Used to verify the pin 
+         * Used to verify the pin
          */
         [HttpPost("verify/pin")]
         public IActionResult VerifyPin(VerifyPinRequest model)
         {
             var user = (User) HttpContext.Items["User"];
-            
+
             var response = _authenticationService.VerifyPin(model, user);
 
             return Ok(response);
@@ -75,7 +74,7 @@ namespace worksheet2.Controllers
 
 
         /**
-         * Used to logout 
+         * Used to logout
          */
         [HttpPost("logout")]
         public IActionResult Logout()

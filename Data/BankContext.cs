@@ -29,7 +29,7 @@ namespace worksheet2.Data
         {
             modelBuilder
                 .Entity<User>()
-                .HasMany<AccountDetails>(user => user.AccountDetails);
+                .HasMany(user => user.AccountDetails);
 
             modelBuilder
                 .Entity<User>()
@@ -54,10 +54,10 @@ namespace worksheet2.Data
                 .Entity<User>()
                 .HasIndex(user => user.AccountNumber)
                 .IsUnique();
-            
+
             modelBuilder
                 .Entity<AccountDetails>()
-                .HasIndex(details =>  details.UserAccountDetailsId)
+                .HasIndex(details => details.UserAccountDetailsId)
                 .IsUnique();
         }
 
