@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using worksheet2.Data;
+using worksheet2.Data.Repository;
 using worksheet2.Model;
 using worksheet2.Model.Response;
 
@@ -8,19 +9,17 @@ namespace worksheet2.Services.Impl
 {
     public class AccountDetailService : IAccountDetailsService
     {
-        private readonly BankContext _context;
+        private readonly IAccountDetailRepository _repository;
 
         public AccountDetailService(
-            BankContext context)
+            IAccountDetailRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         public IEnumerable<AccountDetailsResponse> GetAccountDetailsResponsesById(User user)
         {
-            return _context.AccountDetails
-                .ToList()
-                .Where(details => details.User == user)
+            return _repository.GetAccountDetailsByUser(user)
                 .Select(details => new AccountDetailsResponse
                 {
                     Balance = details.Balance,

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using worksheet2.Data;
+using worksheet2.Data.Repository;
+using worksheet2.Data.Repository.Impl;
 using worksheet2.Model;
 using worksheet2.Model.Response;
 
@@ -8,24 +10,26 @@ namespace worksheet2.Services.Impl
 {
     public class TransactionService : ITransactionService
     {
-        private readonly BankContext _context;
+        private readonly IUserRepository _userRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
-        public TransactionService(BankContext context)
+        public TransactionService(
+            IUserRepository userRepository,
+            ITransactionRepository transactionRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
+            _transactionRepository = transactionRepository;
         }
 
         public List<TransactionResponse> GetTransactionResponses(User user)
         {
-            var transactions = _context.Transactions
-                .Where(transaction => transaction.FromUserId == user.UserId || transaction.ToUserId == user.UserId)
-                .ToList();
+            var transactions = _transactionRepository.GetAllTransactionsForUser(user.UserId);
 
             return (from transaction in transactions
                 let beneficiaryUserId = transaction.FromUserId == user.UserId
                     ? transaction.ToUserId
                     : transaction.FromUserId
-                let beneficiaryUsername = _context.Users.FirstOrDefault(user1 => user1.UserId == beneficiaryUserId)
+                let beneficiaryUsername = _userRepository.GetUserByUserId(beneficiaryUserId)
                     ?.UserName
                 select new TransactionResponse
                 {

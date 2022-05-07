@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using worksheet2.Data;
+using worksheet2.Data.Repository;
 using worksheet2.Model;
 using worksheet2.Model.Request;
 using worksheet2.Model.Response;
@@ -18,22 +19,26 @@ namespace worksheet2.Services.Impl
     public class AuthenticationService : IAuthenticationService
     {
         private readonly AppSettings _appSettings;
-        private readonly BankContext _context;
+        private readonly IUserRepository _userRepository;
+        private readonly IAccountDetailRepository _accountDetailRepository;
+        private readonly IUserDetailsRepository _userDetailsRepository;
 
         public AuthenticationService(
-            BankContext context,
+            IUserRepository userRepository,
+            IAccountDetailRepository accountDetailRepository,
+            IUserDetailsRepository userDetailsRepository,
             IOptions<AppSettings> appOptions
         )
         {
-            _context = context;
+            _userRepository = userRepository;
+            _accountDetailRepository = accountDetailRepository;
+            _userDetailsRepository = userDetailsRepository;
             _appSettings = appOptions.Value;
         }
 
         public AuthenticationResponse Authenticate(AuthenticateRequest request)
         {
-            var user = _context.Users
-                .Include(u => u.UserDetails)
-                .FirstOrDefault(user => user.UserName == request.Username);
+            var user = _userRepository.GetUserByUsername(request.Username);
 
             if (user == null || !Crypto.VerifyHashedPassword(user.Password, request.Password)) return null;
 
@@ -44,9 +49,7 @@ namespace worksheet2.Services.Impl
 
         public AuthenticationResponse AuthenticateByPin(AuthenticatePinRequest request)
         {
-            var user = _context.Users
-                .Include(u => u.UserDetails)
-                .FirstOrDefault(user => user.AccountNumber == request.AccountNumber);
+            var user = _userRepository.GetUserByUsername(request.AccountNumber);
 
             if (user == null || !Crypto.VerifyHashedPassword(user.Pin, request.Pin)) return null;
 
@@ -57,9 +60,8 @@ namespace worksheet2.Services.Impl
 
         public BaseResponse VerifyPin(VerifyPinRequest verifyPinRequest, User user)
         {
-            var userFromContext = _context
-                .Users
-                .FirstOrDefault(user1 => user1.UserId == user.UserId);
+            var userFromContext = _userRepository.GetUserByAccountNumber(user.AccountNumber);
+            ;
 
             if (userFromContext != null && Crypto.VerifyHashedPassword(userFromContext.Pin, verifyPinRequest.Pin))
                 return new BaseResponse("PIN is correct", "Success");
@@ -76,9 +78,7 @@ namespace worksheet2.Services.Impl
                 UserName = request.Username,
                 AccountNumber = GenerateAccount(10)
             };
-            var userEntry = _context.Users
-                .Add(user);
-            var createdUser = userEntry.Entity;
+            var createdUser = _userRepository.CreateUser(user);
             var userDetails = new UserDetails
             {
                 Address = request.Address,
@@ -88,13 +88,10 @@ namespace worksheet2.Services.Impl
                 User = createdUser,
                 PhoneNumber = request.PhoneNumber
             };
-            _context.UserDetails
-                .Add(userDetails);
+            _userDetailsRepository.CreateUserDetails(userDetails);
 
             CreateAccountDetails(createdUser, AccountType.CURRENT);
             CreateAccountDetails(createdUser, AccountType.SAVING);
-
-            _context.SaveChanges();
 
             return new BaseResponse(
                 "Signup Successful",
@@ -111,12 +108,7 @@ namespace worksheet2.Services.Impl
                 User = createdUser,
                 AccountType = accountType
             };
-            _context.AccountDetails
-                .Add(accountDetails);
-
-            _context.SaveChanges();
-
-            _context.Entry(accountDetails).State = EntityState.Detached;
+            _accountDetailRepository.CreateAccountDetail(accountDetails);
         }
 
 
@@ -141,8 +133,7 @@ namespace worksheet2.Services.Impl
             var accountNumber = string.Empty;
             for (var i = 0; i < length; i++)
                 accountNumber = string.Concat(accountNumber, random.Next(10).ToString());
-            var user = _context.Users
-                .FirstOrDefault(user => user.AccountNumber == accountNumber);
+            var user = _userRepository.GetUserByAccountNumber(accountNumber);
             if (user == null)
                 return accountNumber;
             return GenerateAccount(length);

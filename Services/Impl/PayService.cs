@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Linq;
-using worksheet2.Data;
+using worksheet2.Data.Repository;
 using worksheet2.Model;
 using worksheet2.Model.Request;
 using worksheet2.Model.Response;
@@ -9,33 +8,33 @@ namespace worksheet2.Services.Impl
 {
     public class PayService : IPayService
     {
-        private readonly BankContext _context;
+        private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IAccountDetailRepository _accountDetailRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
-        public PayService(BankContext context, IUserService userService)
+        public PayService(
+            IUserRepository userRepository,
+            IUserService userService,
+            IAccountDetailRepository accountDetailRepository,
+            ITransactionRepository transactionRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
             _userService = userService;
-        }
-
-        public PayService(BankContext context)
-        {
-            _context = context;
+            _accountDetailRepository = accountDetailRepository;
+            _transactionRepository = transactionRepository;
         }
 
         public BaseResponse Pay(PayRequest payRequest, User fromUser)
         {
-            var user = _context.Users
-                .FirstOrDefault(user => user.UserName == payRequest.To);
-            var fromAccountDetails = _context.AccountDetails
-                .FirstOrDefault(details => details.User == fromUser && (details.AccountType == AccountType.CURRENT ||
-                                                                        details.AccountType == AccountType.PREMIUM));
+            var user = _userRepository.GetUserByAccountNumber(payRequest.To.AccountNumber);
+
+
+            var fromAccountDetails = _accountDetailRepository.GetCurrentOrPremiumAccount(user);
 
             if (user == null) throw new NotImplementedException();
 
-
-            var toAccountDetails = _context.AccountDetails
-                .FirstOrDefault(details => details.User == user && details.AccountType == AccountType.CURRENT);
+            var toAccountDetails = _accountDetailRepository.GetAccountDetails(user, AccountType.CURRENT);
             if (toAccountDetails == null)
                 return new BaseResponse(
                     "Balance transferred ",
@@ -44,8 +43,6 @@ namespace worksheet2.Services.Impl
             TransferMoney(payRequest, toAccountDetails, fromAccountDetails);
 
             AddTransaction(payRequest, fromUser, user);
-
-            _context.SaveChanges();
 
 
             return new BaseResponse(
@@ -56,43 +53,72 @@ namespace worksheet2.Services.Impl
 
         public BaseResponse ManageFund(ManageFundRequest manageFundRequest, User user)
         {
-            var fromAccountDetails = GetAccountDetails(manageFundRequest.FromAccountType, user);
-            var toAccountDetails = GetAccountDetails(manageFundRequest.ToAccountType, user);
+            // Get Account Details 
+            var fromAccountDetails =
+                _accountDetailRepository.GetAccountDetails(user, manageFundRequest.FromAccountType);
+            var toAccountDetails =
+                _accountDetailRepository.GetAccountDetails(user, manageFundRequest.ToAccountType);
 
-            if (fromAccountDetails != null && fromAccountDetails.Balance > manageFundRequest.Amount)
+            //Deduct balance
+            if (CheckBalanceOfSender(manageFundRequest, fromAccountDetails))
                 fromAccountDetails.Balance -= manageFundRequest.Amount;
             else
                 return new BaseResponse("insufficient balance", "Error");
 
-            toAccountDetails ??= _userService.CreateAccountDetails(user, manageFundRequest.ToAccountType);
+            // Get Account Details of receiver and add balance
+            var accountDetails = GetAccountDetails(manageFundRequest, user);
+            if (toAccountDetails == null)
+            {
+                _accountDetailRepository.CreateAccountDetail(accountDetails);
+                toAccountDetails = _accountDetailRepository.GetAccountDetails(user, manageFundRequest.ToAccountType);
+            }
 
             toAccountDetails.Balance += manageFundRequest.Amount;
 
-            _context.SaveChanges();
+            // Update details of both sender and receiver
+            _accountDetailRepository.Update(toAccountDetails);
+            _accountDetailRepository.Update(fromAccountDetails);
             return new BaseResponse("Fund transferred", "Success");
         }
 
-        private AccountDetails GetAccountDetails(AccountType accountType, User user)
+        private static bool CheckBalanceOfSender(
+            ManageFundRequest manageFundRequest,
+            AccountDetails fromAccountDetails)
         {
-            return _context.AccountDetails
-                .FirstOrDefault(details =>
-                    details.User == user && details.AccountType == accountType);
+            return fromAccountDetails != null && fromAccountDetails.Balance > manageFundRequest.Amount;
         }
 
-        private void TransferMoney(PayRequest payRequest, AccountDetails toAccountDetails,
+        private static AccountDetails GetAccountDetails(
+            ManageFundRequest manageFundRequest,
+            User user)
+        {
+            var accountDetails = new AccountDetails
+            {
+                Balance = 0,
+                Currency = "GBP",
+                User = user,
+                AccountType = manageFundRequest.ToAccountType
+            };
+            return accountDetails;
+        }
+
+        private void TransferMoney(
+            PayRequest payRequest,
+            AccountDetails toAccountDetails,
             AccountDetails fromAccountDetails)
         {
             toAccountDetails.Balance += payRequest.Amount;
-            if (fromAccountDetails != null)
-            {
-                fromAccountDetails.Balance -= payRequest.Amount;
-                _context.AccountDetails.Update(fromAccountDetails);
-            }
+            _accountDetailRepository.Update(toAccountDetails);
+            if (fromAccountDetails == null) return;
+            fromAccountDetails.Balance -= payRequest.Amount;
+            _accountDetailRepository.Update(fromAccountDetails);
         }
 
-        private void AddTransaction(PayRequest payRequest, User fromUser, User user)
+        private void AddTransaction(
+            PayRequest payRequest,
+            User fromUser, User user)
         {
-            _context.Transactions
+            _transactionRepository
                 .Add(new Transaction
                 {
                     FromUserId = fromUser.UserId,

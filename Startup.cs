@@ -8,6 +8,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using worksheet2.Authentication;
 using worksheet2.Data;
+using worksheet2.Data.Repository;
+using worksheet2.Data.Repository.Impl;
 using worksheet2.Model.Settings;
 using worksheet2.Services;
 using worksheet2.Services.Impl;
@@ -31,12 +33,8 @@ namespace worksheet2
 
             services.AddMemoryCache();
             services.Configure<AppSettings>(appSettings);
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IAccountDetailsService, AccountDetailService>();
-            services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<IPayService, PayService>();
-            services.AddScoped<ICurrencyRateService, CurrencyRateService>();
+            RegisterServices(services);
+            RegisterRepositories(services);
             services.AddDbContext<BankContext>(
                 options => options.UseMySQL(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -52,6 +50,24 @@ namespace worksheet2
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "worksheet2", Version = "v1"});
             });
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountDetailsService, AccountDetailService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IPayService, PayService>();
+            services.AddScoped<ICurrencyRateService, CurrencyRateService>();
+        }
+
+        private static void RegisterRepositories(IServiceCollection services)
+        {
+            services.AddScoped<IAccountDetailRepository, AccountDetailRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IUserDetailsRepository, UserDetailsRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

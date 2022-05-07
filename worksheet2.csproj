@@ -5,16 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4"/>
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.9.0"/>
-        <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3"/>
-        <PackageReference Include="System.Web.Helpers.Crypto" Version="3.2.3"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Data\DAO"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.9.0" />
+        <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+        <PackageReference Include="System.Web.Helpers.Crypto" Version="3.2.3" />
     </ItemGroup>
 
 </Project>

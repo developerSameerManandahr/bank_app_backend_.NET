@@ -14,14 +14,5 @@ namespace worksheet2.Controllers
         {
             _userService = userService;
         }
-
-        [HttpGet("details")]
-        [Authorize]
-        public IActionResult Authenticate()
-        {
-            var response = _userService.GetAll();
-
-            return Ok(response);
-        }
     }
 }
