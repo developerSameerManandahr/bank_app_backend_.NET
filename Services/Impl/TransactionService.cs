@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using worksheet2.Data;
 using worksheet2.Data.Repository;
-using worksheet2.Data.Repository.Impl;
 using worksheet2.Model;
 using worksheet2.Model.Response;
 
@@ -10,8 +8,8 @@ namespace worksheet2.Services.Impl
 {
     public class TransactionService : ITransactionService
     {
-        private readonly IUserRepository _userRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IUserRepository _userRepository;
 
         public TransactionService(
             IUserRepository userRepository,
@@ -21,7 +19,7 @@ namespace worksheet2.Services.Impl
             _transactionRepository = transactionRepository;
         }
 
-        public List<TransactionResponse> GetTransactionResponses(User user)
+        public IEnumerable<TransactionResponse> GetTransactionResponses(User user)
         {
             var transactions = _transactionRepository.GetAllTransactionsForUser(user.UserId);
 

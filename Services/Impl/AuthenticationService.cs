@@ -1,13 +1,10 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Web.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using worksheet2.Data;
 using worksheet2.Data.Repository;
 using worksheet2.Model;
 using worksheet2.Model.Request;
@@ -18,10 +15,10 @@ namespace worksheet2.Services.Impl
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly AppSettings _appSettings;
-        private readonly IUserRepository _userRepository;
         private readonly IAccountDetailRepository _accountDetailRepository;
+        private readonly AppSettings _appSettings;
         private readonly IUserDetailsRepository _userDetailsRepository;
+        private readonly IUserRepository _userRepository;
 
         public AuthenticationService(
             IUserRepository userRepository,
@@ -58,18 +55,29 @@ namespace worksheet2.Services.Impl
             return new AuthenticationResponse(user, token);
         }
 
-        public BaseResponse VerifyPin(VerifyPinRequest verifyPinRequest, User user)
+        public BaseResponse VerifyPin(string pin, User user)
         {
             var userFromContext = _userRepository.GetUserByAccountNumber(user.AccountNumber);
-            ;
 
-            if (userFromContext != null && Crypto.VerifyHashedPassword(userFromContext.Pin, verifyPinRequest.Pin))
+            if (userFromContext != null && Crypto.VerifyHashedPassword(userFromContext.Pin, pin))
                 return new BaseResponse("PIN is correct", "Success");
 
             return new BaseResponse("PIN is incorrect", "Error");
         }
 
-        public BaseResponse SignUp(SignupRequest request)
+        public BaseResponse VerifyAccountDetails(VerifyAccountDetailsRequest request)
+        {
+            var userFromContext = _userRepository.GetUserByAccountNumber(request.AccountNumber);
+
+            if (userFromContext != null && GetFullName(userFromContext).Equals(request.FullName))
+            {
+                return new BaseResponse("Details correct", "Success");
+            }
+
+            return new BaseResponse("Details are incorrect", "Error");
+        }
+
+        public AuthenticationResponse SignUp(SignupRequest request)
         {
             var user = new User
             {
@@ -93,10 +101,9 @@ namespace worksheet2.Services.Impl
             CreateAccountDetails(createdUser, AccountType.CURRENT);
             CreateAccountDetails(createdUser, AccountType.SAVING);
 
-            return new BaseResponse(
-                "Signup Successful",
-                "Success"
-            );
+            var token = GenerateJwtToken(createdUser);
+
+            return new AuthenticationResponse(user, token);
         }
 
         private void CreateAccountDetails(User createdUser, AccountType accountType)
@@ -137,6 +144,14 @@ namespace worksheet2.Services.Impl
             if (user == null)
                 return accountNumber;
             return GenerateAccount(length);
+        }
+
+        private static string GetFullName(User user)
+        {
+            var middleName = user.UserDetails.MiddleName is {Length: > 0}
+                ? user.UserDetails.MiddleName + " "
+                : user.UserDetails.MiddleName;
+            return user.UserDetails.FirstName + " " + middleName + user.UserDetails.LastName;
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using worksheet2.Data;
-using worksheet2.Data.Repository;
+﻿using worksheet2.Data.Repository;
 using worksheet2.Model;
 
 namespace worksheet2.Services.Impl

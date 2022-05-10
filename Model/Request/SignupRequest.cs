@@ -23,6 +23,7 @@ namespace worksheet2.Model.Request
 
         [MinLength(11)]
         [MaxLength(12)]
+        [RegularExpression("^[0-9]+$", ErrorMessage = "The Phone Number should consists number only")]
         [Required]
         public string PhoneNumber { get; set; }
     }

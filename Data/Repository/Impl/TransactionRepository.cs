@@ -9,9 +9,17 @@ namespace worksheet2.Data.Repository.Impl
     {
         private readonly BankContext _context;
 
+        private bool _disposed;
+
         public TransactionRepository(BankContext context)
         {
             _context = context;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public List<Transaction> GetAllTransactionsForUser(string userId)
@@ -25,27 +33,16 @@ namespace worksheet2.Data.Repository.Impl
         {
             _context.Transactions
                 .Add(transaction);
+            _context.SaveChanges();
         }
-
-        private bool _disposed;
 
         private void Dispose(bool disposing)
         {
             if (!_disposed)
-            {
                 if (disposing)
-                {
                     _context.Dispose();
-                }
-            }
 
             _disposed = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

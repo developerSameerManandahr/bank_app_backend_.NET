@@ -6,7 +6,7 @@ namespace worksheet2.Model
 {
     public class Transaction
     {
-        [Key] [ForeignKey("User")] public string UserTransactionId { get; set; }
+        [Key] public string UserTransactionId { get; set; }
 
         public virtual User User { get; set; }
         public string FromUserId { get; set; }

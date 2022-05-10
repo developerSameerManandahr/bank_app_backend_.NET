@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using worksheet2.Model;
+﻿using worksheet2.Model;
 
 namespace worksheet2.Services
 {
     public interface IUserService
     {
-
         User GetById(string id);
     }
 }

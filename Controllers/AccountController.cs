@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using worksheet2.Authentication;
 using worksheet2.Model;
+using worksheet2.Model.Response;
 using worksheet2.Services;
 
 namespace worksheet2.Controllers
@@ -25,7 +26,7 @@ namespace worksheet2.Controllers
             var response = _accountDetailsService
                 .GetAccountDetailsResponsesById(user);
 
-            return Ok(response);
+            return Ok(new BaseResponse("Fetched Account Details Successfully", "Success", response));
         }
     }
 }

@@ -6,7 +6,6 @@ namespace worksheet2.Services
 {
     public interface ITransactionService
     {
-        
-        List<TransactionResponse> GetTransactionResponses(User user);
+        IEnumerable<TransactionResponse> GetTransactionResponses(User user);
     }
 }

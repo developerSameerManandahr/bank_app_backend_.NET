@@ -5,9 +5,16 @@ using worksheet2.Model;
 
 namespace worksheet2.Data.Repository.Impl
 {
-    public class AccountDetailRepository : IAccountDetailRepository, IDisposable
+    public sealed class AccountDetailRepository : IAccountDetailRepository, IDisposable
     {
         private readonly BankContext _context;
+
+        private bool _disposed;
+
+        public AccountDetailRepository(BankContext context)
+        {
+            _context = context;
+        }
 
 
         public void CreateAccountDetail(AccountDetails accountDetails)
@@ -36,39 +43,29 @@ namespace worksheet2.Data.Repository.Impl
         {
             return _context.AccountDetails
                 .FirstOrDefault(details => details.User == user &&
-                                           (details.AccountType == accountType));
+                                           details.AccountType == accountType);
         }
 
         public void Update(AccountDetails accountDetails)
         {
             _context.AccountDetails
                 .Update(accountDetails);
-        }
-
-        private bool _disposed;
-
-        public AccountDetailRepository(BankContext context)
-        {
-            _context = context;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _context.Dispose();
-                }
-            }
-
-            _disposed = true;
+            _context.SaveChanges();
         }
 
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+                if (disposing)
+                    _context.Dispose();
+
+            _disposed = true;
         }
     }
 }

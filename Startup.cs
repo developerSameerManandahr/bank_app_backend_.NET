@@ -42,9 +42,13 @@ namespace worksheet2
                 .AddJsonOptions(
                     options =>
                     {
-                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                        // options.JsonSerializerOptions.ReferenceHandler = 
+                        //     ReferenceHandler.Preserve;
+
                         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     });
+
+            services.AddAuthentication();
 
             services.AddSwaggerGen(c =>
             {
@@ -82,8 +86,13 @@ namespace worksheet2
 
             app.UseHttpsRedirection();
 
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+            
             app.UseRouting();
-
+            
             app.UseAuthorization();
 
             app.UseMiddleware<JwtMiddleware>();

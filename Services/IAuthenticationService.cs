@@ -6,11 +6,12 @@ namespace worksheet2.Services
 {
     public interface IAuthenticationService
     {
-        BaseResponse SignUp(SignupRequest request);
+        AuthenticationResponse SignUp(SignupRequest request);
+        BaseResponse VerifyAccountDetails(VerifyAccountDetailsRequest request);
 
         AuthenticationResponse Authenticate(AuthenticateRequest request);
 
         AuthenticationResponse AuthenticateByPin(AuthenticatePinRequest request);
-        BaseResponse VerifyPin(VerifyPinRequest request, User user);
+        BaseResponse VerifyPin(string request, User user);
     }
 }

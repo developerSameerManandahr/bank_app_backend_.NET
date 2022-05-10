@@ -6,9 +6,14 @@ namespace worksheet2.Model.Request
     {
         public ToCredentials To { get; set; }
         public long Amount { get; set; }
+        
+        public string Description { get; set; }
+        
+        public string Pin { get; set; }
+        
     }
 
-    public abstract class ToCredentials
+    public class ToCredentials
     {
         public string FullName { get; set; }
 

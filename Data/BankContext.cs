@@ -39,8 +39,7 @@ namespace worksheet2.Data
 
             modelBuilder
                 .Entity<User>()
-                .HasMany(u => u.Transactions)
-                .WithOne(details => details.User);
+                .HasMany(u => u.Transactions);
         }
 
         private static void MakeFieldsUnique(ModelBuilder modelBuilder)

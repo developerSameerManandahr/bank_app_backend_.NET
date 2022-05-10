@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Helpers;
 using worksheet2.Model;
 
@@ -19,8 +20,9 @@ namespace worksheet2.Data
                 UserName = "root",
                 Password = Crypto
                     .HashPassword("root"), //var verifyPassword = Crypto.VerifyHashedPassword(hash, "root");
-                Pin = Crypto.HashPassword("1234"),
-                AccountNumber = "0123456789"
+                Pin = Crypto.HashPassword("123456"),
+                AccountNumber = "0123456789",
+                CreatedDate = DateTime.Now
             };
 
             var accountDetails = new AccountDetails

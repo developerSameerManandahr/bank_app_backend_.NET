@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using worksheet2.Authentication;
 using worksheet2.Model;
+using worksheet2.Model.Response;
 using worksheet2.Services;
 
 namespace worksheet2.Controllers
@@ -18,11 +19,11 @@ namespace worksheet2.Controllers
 
         [HttpGet("view")]
         [Authorize]
-        public IActionResult Authenticate()
+        public IActionResult ViewTransaction()
         {
             var user = (User) HttpContext.Items["User"];
             var response = _transactionService.GetTransactionResponses(user);
-            return Ok(response);
+            return Ok(new BaseResponse("Fetched Transaction Details Successfully", "Success", response));
         }
     }
 }

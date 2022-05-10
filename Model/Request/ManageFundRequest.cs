@@ -9,5 +9,7 @@ namespace worksheet2.Model.Request
 
         [Range(5, double.MaxValue, ErrorMessage = "Please enter amount that is greater than 5")]
         public long Amount { get; set; }
+        
+        public string Pin { get; set; }
     }
 }

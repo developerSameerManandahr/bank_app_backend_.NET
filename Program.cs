@@ -13,6 +13,7 @@ namespace worksheet2
         {
             var host = CreateHostBuilder(args).Build();
             CreateDbIfNotExists(host);
+            
             host.Run();
         }
 

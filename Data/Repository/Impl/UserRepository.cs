@@ -2,11 +2,10 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using worksheet2.Model;
-using worksheet2.Model.Request;
 
 namespace worksheet2.Data.Repository.Impl
 {
-    public class UserRepository : IUserRepository, IDisposable
+    public sealed class UserRepository : IUserRepository, IDisposable
     {
         private readonly BankContext _context;
 
@@ -15,6 +14,12 @@ namespace worksheet2.Data.Repository.Impl
         public UserRepository(BankContext context)
         {
             _context = context;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public User CreateUser(User user)
@@ -46,23 +51,13 @@ namespace worksheet2.Data.Repository.Impl
                 .FirstOrDefault(user => user.AccountNumber == accountNumber);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposed)
-            {
                 if (disposing)
-                {
                     _context.Dispose();
-                }
-            }
 
             _disposed = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }
