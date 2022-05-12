@@ -26,7 +26,8 @@ namespace worksheet2.Controllers
             var response = _accountDetailsService
                 .GetAccountDetailsResponsesById(user);
 
-            return Ok(new BaseResponse("Fetched Account Details Successfully", "Success", response));
+            var baseResponse = new BaseResponse("Fetched Account Details Successfully", "Success", response);
+            return Ok(baseResponse);
         }
     }
 }

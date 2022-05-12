@@ -24,6 +24,11 @@ namespace worksheet2.Controllers
             var user = (User) HttpContext.Items["User"];
             var response = _payService.Pay(payRequest, user);
 
+            if (Helper.Helper.IsBadRequest(response))
+            {
+                return BadRequest(response);
+            }
+
             return Ok(response);
         }
 
@@ -33,6 +38,11 @@ namespace worksheet2.Controllers
         {
             var user = (User) HttpContext.Items["User"];
             var response = _payService.ManageFund(manageFundRequest, user);
+            if (Helper.Helper.IsBadRequest(response))
+            {
+                return BadRequest(response);
+            }
+
             return Ok(response);
         }
     }

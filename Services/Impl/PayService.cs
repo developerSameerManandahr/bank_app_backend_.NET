@@ -49,6 +49,14 @@ namespace worksheet2.Services.Impl
                     "Balance transferred ",
                     "Success"
                 );
+
+            if (fromAccountDetails == null || fromAccountDetails.Balance <= payRequest.Amount)
+            {
+                return new BaseResponse(
+                    "Insufficient Balance",
+                    "Error"
+                );
+            }
             TransferMoney(payRequest, toAccountDetails, fromAccountDetails);
 
             AddTransaction(payRequest, fromUser, user);
@@ -74,7 +82,7 @@ namespace worksheet2.Services.Impl
                 if (CheckBalanceOfSender(manageFundRequest, fromAccountDetails))
                     fromAccountDetails.Balance -= manageFundRequest.Amount;
                 else
-                    return new BaseResponse("insufficient balance", "Error");
+                    return new BaseResponse("Insufficient balance", "Error");
 
                 // Get Account Details of receiver and add balance
                 var accountDetails = GetAccountDetails(manageFundRequest, user);
@@ -135,8 +143,6 @@ namespace worksheet2.Services.Impl
             AccountDetails toAccountDetails,
             AccountDetails fromAccountDetails)
         {
-            if (fromAccountDetails == null || fromAccountDetails.Balance <= payRequest.Amount)
-                throw new NotImplementedException();
             fromAccountDetails.Balance -= payRequest.Amount;
             toAccountDetails.Balance += payRequest.Amount;
             _accountDetailRepository.Update(toAccountDetails);

@@ -22,6 +22,7 @@ namespace worksheet2.Controllers
         public IActionResult ViewTransaction()
         {
             var user = (User) HttpContext.Items["User"];
+            if (user == null) return BadRequest(new {message = "Bad Token"});
             var response = _transactionService.GetTransactionResponses(user);
             return Ok(new BaseResponse("Fetched Transaction Details Successfully", "Success", response));
         }

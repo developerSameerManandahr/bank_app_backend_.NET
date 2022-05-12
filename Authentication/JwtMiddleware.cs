@@ -13,48 +13,39 @@ namespace worksheet2.Authentication
 {
     public class JwtMiddleware
     {
-        private readonly AppSettings _appSettings;
         private readonly RequestDelegate _next;
 
         public JwtMiddleware(
-            RequestDelegate next,
-            IOptions<AppSettings> appSettings)
+            RequestDelegate next)
         {
             _next = next;
-            _appSettings = appSettings.Value;
         }
 
         /**
          * checks the token and attach user to context
          */
-        public async Task Invoke(HttpContext context, IUserService userService)
+        public async Task Invoke(
+            HttpContext context,
+            IUserService userService,
+            ITokenService tokenService)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)
-                AttachUserToContext(context, userService, token);
+                AttachUserToContext(context, userService, tokenService, token);
 
             await _next(context);
         }
 
-        private void AttachUserToContext(HttpContext context, IUserService userService, string token)
+        private void AttachUserToContext(
+            HttpContext context,
+            IUserService userService,
+            ITokenService tokenService,
+            string token)
         {
             try
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-
-                    ClockSkew = TimeSpan.Zero
-                }, out var validatedToken);
-
-                var jwtToken = (JwtSecurityToken) validatedToken;
-                var userId = jwtToken.Claims.First(x => x.Type == "id").Value;
+                var userId = tokenService.GetUserIdFromToken(token);
 
                 // attach user to context on successful jwt validation
                 context.Items["User"] = userService.GetById(userId);

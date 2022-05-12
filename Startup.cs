@@ -64,6 +64,7 @@ namespace worksheet2
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPayService, PayService>();
             services.AddScoped<ICurrencyRateService, CurrencyRateService>();
+            services.AddScoped<ITokenService, TokenService>();
         }
 
         private static void RegisterRepositories(IServiceCollection services)
