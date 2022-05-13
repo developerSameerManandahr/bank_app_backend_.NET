@@ -21,11 +21,16 @@ namespace worksheet2.Controllers
          * Endpoint to get Account Details
          */
         [HttpGet("Details")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult GetAccountDetails()
         {
             var user = (User) HttpContext.Items["User"];
-            if (user == null) return BadRequest(new {message = "Bad Token"});
+            if (user == null)
+            {
+                var error = new {message = "Bad Token"};
+                return BadRequest(error);
+            }
+
             var response = _accountDetailsService
                 .GetAccountDetailsResponsesById(user);
 

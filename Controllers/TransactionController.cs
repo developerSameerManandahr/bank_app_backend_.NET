@@ -21,11 +21,17 @@ namespace worksheet2.Controllers
          * Endpoint to view transactions
          */
         [HttpGet("view")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult ViewTransaction()
         {
-            var user = (User) HttpContext.Items["User"];
-            if (user == null) return BadRequest(new {message = "Bad Token"});
+            var httpContextItems = HttpContext.Items;
+            var user = (User) httpContextItems["User"];
+            if (user == null)
+            {
+                var error = new {message = "Bad Token"};
+                return BadRequest(error);
+            }
+
             var response = _transactionService.GetTransactionResponses(user);
             return Ok(new BaseResponse("Fetched Transaction Details Successfully", "Success", response));
         }

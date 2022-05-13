@@ -21,10 +21,10 @@ namespace worksheet2.Controllers
          * Endpoint to pay someone or transfer money to other account
          */
         [HttpPost("someone")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult PaySomeone(PayRequest payRequest)
         {
-            var user = (User) HttpContext.Items["User"];
+            var user = GetUser();
             var response = _payService.Pay(payRequest, user);
 
             if (Helper.Helper.IsBadRequest(response))
@@ -39,10 +39,10 @@ namespace worksheet2.Controllers
          * Endpoint to transfer balance from one account type to other
          */
         [HttpPost("manage/fund")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult ManageFund(ManageFundRequest manageFundRequest)
         {
-            var user = (User) HttpContext.Items["User"];
+            var user = GetUser();
             var response = _payService.ManageFund(manageFundRequest, user);
             if (Helper.Helper.IsBadRequest(response))
             {
@@ -50,6 +50,12 @@ namespace worksheet2.Controllers
             }
 
             return Ok(response);
+        }
+
+        private User GetUser()
+        {
+            var httpContextItem = HttpContext.Items["User"];
+            return (User) httpContextItem;
         }
     }
 }

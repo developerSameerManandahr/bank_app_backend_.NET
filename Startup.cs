@@ -25,32 +25,28 @@ namespace worksheet2
 
         private IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection serviceCollection)
         {
-            var appSettings = Configuration
+            var config = Configuration
                 .GetSection("AppSettings");
 
-            services.AddMemoryCache();
-            services.Configure<AppSettings>(appSettings);
-            RegisterServices(services);
-            RegisterRepositories(services);
-            services.AddDbContext<BankContext>(
+            serviceCollection.AddMemoryCache();
+            serviceCollection.Configure<AppSettings>(config);
+            RegisterServices(serviceCollection);
+            RegisterRepositories(serviceCollection);
+            serviceCollection.AddDbContext<BankContext>(
                 options => options.UseMySQL(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers()
+            serviceCollection.AddControllers()
                 .AddJsonOptions(
                     options =>
                     {
-                        // options.JsonSerializerOptions.ReferenceHandler = 
-                        //     ReferenceHandler.Preserve;
-
                         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     });
 
-            services.AddAuthentication();
+            serviceCollection.AddAuthentication();
 
-            services.AddSwaggerGen(c =>
+            serviceCollection.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "worksheet2", Version = "v1"});
             });
@@ -75,30 +71,29 @@ namespace worksheet2
             services.AddScoped<IUserRepository, UserRepository>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder applicationBuilder, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "worksheet2 v1"));
+                applicationBuilder.UseDeveloperExceptionPage();
+                applicationBuilder.UseSwagger();
+                applicationBuilder.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "worksheet2 v1"));
             }
 
-            app.UseHttpsRedirection();
+            applicationBuilder.UseHttpsRedirection();
 
-            app.UseCors(builder => builder
+            applicationBuilder.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
             
-            app.UseRouting();
+            applicationBuilder.UseRouting();
             
-            app.UseAuthorization();
+            applicationBuilder.UseAuthorization();
 
-            app.UseMiddleware<JwtMiddleware>();
+            applicationBuilder.UseMiddleware<TokenCheckMiddleware>();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            applicationBuilder.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

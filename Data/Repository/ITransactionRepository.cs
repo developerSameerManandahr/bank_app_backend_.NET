@@ -7,6 +7,6 @@ namespace worksheet2.Data.Repository
     {
         List<Transaction> GetAllTransactionsForUser(string userId);
 
-        void Add(Transaction transaction);
+        void Add(Transaction record);
     }
 }

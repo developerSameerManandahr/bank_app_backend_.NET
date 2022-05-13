@@ -25,17 +25,18 @@ namespace worksheet2
 
         private static void CreateDbIfNotExists(IHost host)
         {
-            using var scope = host.Services.CreateScope();
-            var services = scope.ServiceProvider;
+            var serviceProvider = host.Services;
+            using var scope = serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
             try
             {
-                var context = services.GetRequiredService<BankContext>();
-                DbInitializer.Initialize(context);
+                var context = provider.GetRequiredService<BankContext>();
+                DatabaseInitializer.CreateIfNotCreatedAlready(context);
             }
             catch (Exception ex)
             {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred creating the DB");
+                var logger = provider.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "DB initialization failed");
             }
         }
     }

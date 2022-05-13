@@ -151,17 +151,19 @@ namespace worksheet2.Services.Impl
          */
         private string GenerateJwtToken(User user)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var securityTokenHandler = new JwtSecurityTokenHandler();
+            var bytes = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var appSettingsTimeOut = _appSettings.TimeOut;
+            var httpWwwW3OrgXmldsigMoreHmacSha256 = SecurityAlgorithms.HmacSha256Signature;
+            var securityTokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {new Claim("id", user.UserId)}),
-                Expires = DateTime.UtcNow.AddMinutes(_appSettings.TimeOut),
+                Expires = DateTime.UtcNow.AddMinutes(appSettingsTimeOut),
                 SigningCredentials =
-                    new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    new SigningCredentials(new SymmetricSecurityKey(bytes), httpWwwW3OrgXmldsigMoreHmacSha256)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            var token = securityTokenHandler.CreateToken(securityTokenDescriptor);
+            return securityTokenHandler.WriteToken(token);
         }
 
         /**

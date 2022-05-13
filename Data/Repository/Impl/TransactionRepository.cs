@@ -29,10 +29,10 @@ namespace worksheet2.Data.Repository.Impl
                 .ToList();
         }
 
-        public void Add(Transaction transaction)
+        public void Add(Transaction record)
         {
             _context.Transactions
-                .Add(transaction);
+                .Add(record);
             _context.SaveChanges();
         }
 

@@ -32,7 +32,10 @@ namespace worksheet2.Controllers
             var response = _authenticationService.Authenticate(model);
 
             if (response == null)
-                return BadRequest(new {message = "Username or password is incorrect"});
+            {
+                var error = new {message = "Username or password is incorrect"};
+                return BadRequest(error);
+            }
 
             return Ok(response);
         }
@@ -46,7 +49,10 @@ namespace worksheet2.Controllers
             var response = _authenticationService.AuthenticateByPin(request);
 
             if (response == null)
-                return BadRequest(new {message = "Pin or Account Number is incorrect"});
+            {
+                var error = new {message = "Pin or Account Number is incorrect"};
+                return BadRequest(error);
+            }
 
             return Ok(response);
         }
@@ -60,7 +66,10 @@ namespace worksheet2.Controllers
             var response = _authenticationService.SignUp(model);
 
             if (response == null)
-                return BadRequest(new {message = "Username or password is incorrect"});
+            {
+                var error = new {message = "Username or password is incorrect"};
+                return BadRequest(error);
+            }
 
 
             return Ok(response);
@@ -71,7 +80,7 @@ namespace worksheet2.Controllers
          * Used to verify the pin
          */
         [HttpPost("verify/pin")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult VerifyPin(VerifyPinRequest model)
         {
             var user = (User) HttpContext.Items["User"];
@@ -91,7 +100,7 @@ namespace worksheet2.Controllers
          * Used to logout
          */
         [HttpPost("logout")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult Logout()
         {
             HttpContext.Items["User"] = null;
@@ -120,7 +129,10 @@ namespace worksheet2.Controllers
         [HttpGet("verify/token")]
         public IActionResult VerifyToken()
         {
-            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var httpContextRequest = HttpContext.Request;
+            var requestHeader = httpContextRequest.Headers["Authorization"];
+            var firstOrDefault = requestHeader.FirstOrDefault();
+            var token = firstOrDefault?.Split(" ").Last();
             if (!_tokenService.ValidateToken(token))
             {
                 return BadRequest(new BaseResponse("Invalid token", "Error"));
@@ -134,7 +146,7 @@ namespace worksheet2.Controllers
          * Endpoint to change pin
          */
         [HttpPut("change/Pin")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult ChangePin(ChangePinRequest changePinRequest)
         {
             var user = (User) HttpContext.Items["User"];
@@ -151,7 +163,7 @@ namespace worksheet2.Controllers
          * Endpoint to change password
          */
         [HttpPut("change/Password")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult ChangePassword(ChangePasswordRequest changePassword)
         {
             var user = (User) HttpContext.Items["User"];

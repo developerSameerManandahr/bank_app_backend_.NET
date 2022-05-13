@@ -8,14 +8,14 @@ namespace worksheet2.Data
     /**
      * Used to insert the data into the database if the database is empty
      */
-    public static class DbInitializer
+    public static class DatabaseInitializer
     {
-        public static void Initialize(BankContext context)
+        public static void CreateIfNotCreatedAlready(BankContext context)
         {
             context.Database.EnsureCreated();
 
-            // Look for any users.
-            if (context.Users.Any()) return; // Data are already been inserted
+            // check if the db is already there
+            if (context.Users.Any()) return; 
 
             var user = new User
             {

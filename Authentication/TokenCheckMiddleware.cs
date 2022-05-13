@@ -11,33 +11,35 @@ using worksheet2.Services;
 
 namespace worksheet2.Authentication
 {
-    public class JwtMiddleware
+    public class TokenCheckMiddleware
     {
-        private readonly RequestDelegate _next;
+        private readonly RequestDelegate _requestDelegate;
 
-        public JwtMiddleware(
-            RequestDelegate next)
+        public TokenCheckMiddleware(
+            RequestDelegate requestDelegate)
         {
-            _next = next;
+            _requestDelegate = requestDelegate;
         }
 
         /**
          * checks the token and attach user to context
          */
         public async Task Invoke(
-            HttpContext context,
+            HttpContext httpContext,
             IUserService userService,
             ITokenService tokenService)
         {
-            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var httpContextRequest = httpContext.Request;
+            var stringValues = httpContextRequest.Headers["Authorization"];
+            var token = stringValues.FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)
-                AttachUserToContext(context, userService, tokenService, token);
+                UpdateHttpContext(httpContext, userService, tokenService, token);
 
-            await _next(context);
+            await _requestDelegate(httpContext);
         }
 
-        private static void AttachUserToContext(
+        private static void UpdateHttpContext(
             HttpContext context,
             IUserService userService,
             ITokenService tokenService,

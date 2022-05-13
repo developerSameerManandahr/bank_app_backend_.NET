@@ -10,11 +10,11 @@ namespace worksheet2.Services.Impl
 {
     public class TokenService : ITokenService
     {
-        private readonly AppSettings _appSettings;
+        private readonly AppSettings _settings;
 
-        public TokenService(IOptions<AppSettings> appSettings)
+        public TokenService(IOptions<AppSettings> options)
         {
-            _appSettings = appSettings.Value;
+            _settings = options.Value;
         }
 
         public bool ValidateToken(string token)
@@ -28,22 +28,26 @@ namespace worksheet2.Services.Impl
         {
             try
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                var securityTokenHandler = new JwtSecurityTokenHandler();
+                var encoding = Encoding.ASCII;
+                var appSettingsSecret = _settings.Secret;
+                var key = encoding.GetBytes(appSettingsSecret);
+                var symmetricSecurityKey = new SymmetricSecurityKey(key);
+                var tokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = symmetricSecurityKey,
                     ValidateIssuer = false,
                     ValidateAudience = false,
 
                     ClockSkew = TimeSpan.Zero
-                }, out var validatedToken);
+                };
+                securityTokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
 
-                var jwtToken = (JwtSecurityToken) validatedToken;
+                var jwtSecurityToken = (JwtSecurityToken) securityToken;
 
-                var userId = jwtToken.Claims.First(x => x.Type == "id").Value;
-                return userId;
+                var enumerable = jwtSecurityToken.Claims;
+                return enumerable.First(x => x.Type == "id").Value;
             }
             catch (Exception e)
             {

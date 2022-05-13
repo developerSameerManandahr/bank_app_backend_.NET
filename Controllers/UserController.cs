@@ -22,7 +22,7 @@ namespace worksheet2.Controllers
          * Endpoint to update user details
          */
         [HttpPut("update/details")]
-        [Authorize]
+        [AuthorizationFilter]
         public IActionResult UpdateDetails(UpdateUserDetailsRequest request)
         {
             var user = (User) HttpContext.Items["User"];
