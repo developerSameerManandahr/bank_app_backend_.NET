@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Request
 {
+    /**
+     * Request model that is required while authenticating with pin
+     */
     public class AuthenticatePinRequest
     {
         [Required]

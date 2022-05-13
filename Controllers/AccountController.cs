@@ -17,6 +17,9 @@ namespace worksheet2.Controllers
             _accountDetailsService = accountDetailsService;
         }
 
+        /**
+         * Endpoint to get Account Details
+         */
         [HttpGet("Details")]
         [Authorize]
         public IActionResult GetAccountDetails()

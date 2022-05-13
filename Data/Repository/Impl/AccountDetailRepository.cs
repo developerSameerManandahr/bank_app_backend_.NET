@@ -5,6 +5,9 @@ using worksheet2.Model;
 
 namespace worksheet2.Data.Repository.Impl
 {
+    /**
+     * Implements IDisposable to dispose the context after its use
+     */
     public sealed class AccountDetailRepository : IAccountDetailRepository, IDisposable
     {
         private readonly BankContext _context;

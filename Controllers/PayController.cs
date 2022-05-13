@@ -17,6 +17,9 @@ namespace worksheet2.Controllers
             _payService = payService;
         }
 
+        /**
+         * Endpoint to pay someone or transfer money to other account
+         */
         [HttpPost("someone")]
         [Authorize]
         public IActionResult PaySomeone(PayRequest payRequest)
@@ -32,6 +35,9 @@ namespace worksheet2.Controllers
             return Ok(response);
         }
 
+        /**
+         * Endpoint to transfer balance from one account type to other
+         */
         [HttpPost("manage/fund")]
         [Authorize]
         public IActionResult ManageFund(ManageFundRequest manageFundRequest)

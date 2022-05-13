@@ -15,7 +15,10 @@ namespace worksheet2.Controllers
             _service = service;
         }
 
-        [HttpGet("convert")]
+        /**
+         * Endpoint to get Exchange Rates
+         */
+        [HttpGet("rates")]
         public async Task<IActionResult> PaySomeone()
         {
             var exchangeRates = await _service.GetExchangeRates();

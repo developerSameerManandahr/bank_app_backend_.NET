@@ -9,5 +9,6 @@ namespace worksheet2.Data.Repository
         User GetUserByUserId(string userId);
         User GetUserByUsername(string username);
         User GetUserByAccountNumber(string accountNumber);
+        void Update(User user);
     }
 }

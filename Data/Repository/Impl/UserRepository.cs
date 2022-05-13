@@ -50,6 +50,13 @@ namespace worksheet2.Data.Repository.Impl
                 .Include(u => u.UserDetails)
                 .FirstOrDefault(user => user.AccountNumber == accountNumber);
         }
+        
+        public void Update(User user)
+        {
+            _context.Users
+                .Update(user);
+            _context.SaveChanges();
+        }
 
         private void Dispose(bool disposing)
         {

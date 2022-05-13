@@ -27,28 +27,29 @@ namespace worksheet2.Services.Impl
 
         public BaseResponse Pay(PayRequest payRequest, User fromUser)
         {
+            //Verify PIN
             if (!_authenticationService.VerifyPin(payRequest.Pin, fromUser).MessageType.Equals("Success"))
             {
                 return new BaseResponse("PIN wrong", "Error");
             }
 
+            // Verify the recipients details 
             var user = _userRepository.GetUserByAccountNumber(payRequest.To.AccountNumber);
 
             if (!CheckIfTheRequestIsGenuine(payRequest, user))
             {
                 return new BaseResponse("Provided information is wrong !!", "Error");
             }
-
-            var fromAccountDetails = _accountDetailRepository.GetCurrentOrPremiumAccount(fromUser);
-
-            if (user == null) throw new NotImplementedException();
-
+            
+            //Check if the sender has enough balance
             var toAccountDetails = _accountDetailRepository.GetAccountDetails(user, AccountType.CURRENT);
-            if (toAccountDetails == null)
+            if (toAccountDetails == null || user == null)
                 return new BaseResponse(
-                    "Balance transferred ",
-                    "Success"
+                    "Balance transfer failed ! Details is wrong ",
+                    "Error"
                 );
+            
+            var fromAccountDetails = _accountDetailRepository.GetCurrentOrPremiumAccount(fromUser);
 
             if (fromAccountDetails == null || fromAccountDetails.Balance <= payRequest.Amount)
             {
@@ -57,6 +58,7 @@ namespace worksheet2.Services.Impl
                     "Error"
                 );
             }
+
             TransferMoney(payRequest, toAccountDetails, fromAccountDetails);
 
             AddTransaction(payRequest, fromUser, user);
@@ -70,53 +72,48 @@ namespace worksheet2.Services.Impl
 
         public BaseResponse ManageFund(ManageFundRequest manageFundRequest, User user)
         {
-            if (_authenticationService.VerifyPin(manageFundRequest.Pin, user).MessageType.Equals("Success"))
+            if (!_authenticationService.VerifyPin(manageFundRequest.Pin, user).MessageType.Equals("Success"))
+                return new BaseResponse("PIN Incorrect", "ERROR");
+            // Get Account Details 
+            var fromAccountDetails =
+                _accountDetailRepository.GetAccountDetails(user, manageFundRequest.FromAccountType);
+            var toAccountDetails =
+                _accountDetailRepository.GetAccountDetails(user, manageFundRequest.ToAccountType);
+
+            //check balance and deduct balance
+            if (CheckBalanceOfSender(manageFundRequest, fromAccountDetails))
+                fromAccountDetails.Balance -= manageFundRequest.Amount;
+            else
+                return new BaseResponse("Insufficient balance", "Error");
+
+            // Get Account Details of receiver and add balance
+            var accountDetails = GetAccountDetailsOfReceiver(manageFundRequest, user);
+            if (toAccountDetails == null)
             {
-                // Get Account Details 
-                var fromAccountDetails =
-                    _accountDetailRepository.GetAccountDetails(user, manageFundRequest.FromAccountType);
-                var toAccountDetails =
+                _accountDetailRepository.CreateAccountDetail(accountDetails);
+                toAccountDetails =
                     _accountDetailRepository.GetAccountDetails(user, manageFundRequest.ToAccountType);
-
-                //Deduct balance
-                if (CheckBalanceOfSender(manageFundRequest, fromAccountDetails))
-                    fromAccountDetails.Balance -= manageFundRequest.Amount;
-                else
-                    return new BaseResponse("Insufficient balance", "Error");
-
-                // Get Account Details of receiver and add balance
-                var accountDetails = GetAccountDetails(manageFundRequest, user);
-                if (toAccountDetails == null)
-                {
-                    _accountDetailRepository.CreateAccountDetail(accountDetails);
-                    toAccountDetails =
-                        _accountDetailRepository.GetAccountDetails(user, manageFundRequest.ToAccountType);
-                }
-
-                toAccountDetails.Balance += manageFundRequest.Amount;
-
-                // Update details of both sender and receiver
-                _accountDetailRepository.Update(toAccountDetails);
-                _accountDetailRepository.Update(fromAccountDetails);
-                return new BaseResponse("Fund transferred", "Success");
             }
-            return new BaseResponse("PIN Incorrect", "ERROR");
 
+            toAccountDetails.Balance += manageFundRequest.Amount;
+
+            // Update details of both sender and receiver
+            _accountDetailRepository.Update(toAccountDetails);
+            _accountDetailRepository.Update(fromAccountDetails);
+            return new BaseResponse("Fund transferred", "Success");
         }
 
+        /**
+         * Verifies the provided full name with actual full name got from the account number
+         */
         private static bool CheckIfTheRequestIsGenuine(PayRequest payRequest, User user)
         {
-            return payRequest.To.FullName.Equals(GetFullName(user));
+            return payRequest.To.FullName.Equals(Helper.Helper.GetFullName(user));
         }
 
-        private static string GetFullName(User user)
-        {
-            var middleName = user.UserDetails.MiddleName is {Length: > 0}
-                ? user.UserDetails.MiddleName + " "
-                : user.UserDetails.MiddleName;
-            return user.UserDetails.FirstName + " " + middleName + user.UserDetails.LastName;
-        }
-
+        /**
+         * Checks if the sender has enough balance to send money
+         */
         private static bool CheckBalanceOfSender(
             ManageFundRequest manageFundRequest,
             AccountDetails fromAccountDetails)
@@ -124,7 +121,10 @@ namespace worksheet2.Services.Impl
             return fromAccountDetails != null && fromAccountDetails.Balance > manageFundRequest.Amount;
         }
 
-        private static AccountDetails GetAccountDetails(
+        /**
+         * Creates account details object for receiver
+         */
+        private static AccountDetails GetAccountDetailsOfReceiver(
             ManageFundRequest manageFundRequest,
             User user)
         {
@@ -138,6 +138,9 @@ namespace worksheet2.Services.Impl
             return accountDetails;
         }
 
+        /**
+         * deduct and add funds and updates
+         */
         private void TransferMoney(
             PayRequest payRequest,
             AccountDetails toAccountDetails,
@@ -150,6 +153,9 @@ namespace worksheet2.Services.Impl
             _accountDetailRepository.Update(fromAccountDetails);
         }
 
+        /**
+         * Adds transaction entry to the database
+         */
         private void AddTransaction(
             PayRequest payRequest,
             User fromUser, User user)

@@ -27,8 +27,8 @@ namespace worksheet2.Services.Impl
                 let beneficiaryUserId = transaction.FromUserId == user.UserId
                     ? transaction.ToUserId
                     : transaction.FromUserId
-                let beneficiaryUsername = _userRepository.GetUserByUserId(beneficiaryUserId)
-                    ?.UserName
+                let currentUser = _userRepository.GetUserByUserId(beneficiaryUserId)
+                let beneficiaryUsername = Helper.Helper.GetFullName(currentUser)
                 select new TransactionResponse
                 {
                     Amount = transaction.Amount,

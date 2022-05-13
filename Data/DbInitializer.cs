@@ -5,6 +5,9 @@ using worksheet2.Model;
 
 namespace worksheet2.Data
 {
+    /**
+     * Used to insert the data into the database if the database is empty
+     */
     public static class DbInitializer
     {
         public static void Initialize(BankContext context)
@@ -30,7 +33,7 @@ namespace worksheet2.Data
                 Balance = 1000000000,
                 Currency = "GBP",
                 User = user,
-                AccountType = AccountType.PREMIUM
+                AccountType = AccountType.CURRENT
             };
 
             var userDetails = new UserDetails

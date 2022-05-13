@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Request
 {
+    /**
+     * Request model that is required while transferring balance to other
+     */
     public class PayRequest
     {
         public ToCredentials To { get; set; }

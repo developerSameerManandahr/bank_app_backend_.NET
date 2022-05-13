@@ -91,13 +91,16 @@ namespace worksheet2.Controllers
          * Used to logout
          */
         [HttpPost("logout")]
+        [Authorize]
         public IActionResult Logout()
         {
             HttpContext.Items["User"] = null;
             return Ok("Logged out Successfully!");
         }
 
-
+        /**
+         * Endpoint to verify the provided user details
+         */
         [HttpPost("verify/details")]
         public IActionResult VerifyAccountDetails(VerifyAccountDetailsRequest request)
         {
@@ -111,6 +114,9 @@ namespace worksheet2.Controllers
             return Ok(response);
         }
 
+        /**
+         * Endpoint to verify token
+         */
         [HttpGet("verify/token")]
         public IActionResult VerifyToken()
         {
@@ -121,6 +127,41 @@ namespace worksheet2.Controllers
             }
 
             return Ok(new BaseResponse("Token is valid", "Success"));
+        }
+
+
+        /**
+         * Endpoint to change pin
+         */
+        [HttpPut("change/Pin")]
+        [Authorize]
+        public IActionResult ChangePin(ChangePinRequest changePinRequest)
+        {
+            var user = (User) HttpContext.Items["User"];
+            var baseResponse = _authenticationService.ChangePin(changePinRequest, user);
+            if (Helper.Helper.IsBadRequest(baseResponse))
+            {
+                return BadRequest(baseResponse);
+            }
+
+            return Ok(baseResponse);
+        }
+
+        /**
+         * Endpoint to change password
+         */
+        [HttpPut("change/Password")]
+        [Authorize]
+        public IActionResult ChangePassword(ChangePasswordRequest changePassword)
+        {
+            var user = (User) HttpContext.Items["User"];
+            var baseResponse = _authenticationService.ChangePassword(changePassword, user);
+            if (Helper.Helper.IsBadRequest(baseResponse))
+            {
+                return BadRequest(baseResponse);
+            }
+
+            return Ok(baseResponse);
         }
     }
 }

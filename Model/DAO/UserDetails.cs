@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace worksheet2.Model
 {
+    /**
+     * Entity class to store user details
+     */
     public class UserDetails
     {
         [Key] [ForeignKey("User")] public string UserUserDetailsId { get; set; }

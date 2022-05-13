@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model
 {
+    /**
+     * Entity class to store account details
+     */
     public class AccountDetails
     {
         [Key] public string UserAccountDetailsId { get; set; }

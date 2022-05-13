@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Response
 {
+    /**
+     * Response we get for Exchange rates API
+     */
     public class Exchange
     {
         public bool Success { get; set; }

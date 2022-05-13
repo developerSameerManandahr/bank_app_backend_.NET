@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Request
 {
+    /**
+     * Request model that is required while moving fund from one account type to other from API
+     */
     public class ManageFundRequest
     {
         public AccountType FromAccountType { get; set; }

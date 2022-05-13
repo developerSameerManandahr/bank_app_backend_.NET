@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Response
 {
+    /**
+     * Response we see for view Transaction api
+     */
     public class TransactionResponse
     {
         public string TransactionType { get; set; }

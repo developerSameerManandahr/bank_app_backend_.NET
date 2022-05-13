@@ -37,7 +37,7 @@ namespace worksheet2.Authentication
             await _next(context);
         }
 
-        private void AttachUserToContext(
+        private static void AttachUserToContext(
             HttpContext context,
             IUserService userService,
             ITokenService tokenService,

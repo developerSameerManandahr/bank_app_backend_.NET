@@ -29,7 +29,7 @@ namespace worksheet2.Services.Impl
 
         public async Task<Exchange> GetExchangeRates()
         {
-            //if it is in cache get it from cache to improve the speed.
+            //if it is in cache get it from cache to reduce the need of creating a HTTP request
             if (_memoryCache.TryGetValue("Exchange", out Exchange exchange)) return exchange;
 
             var query = new Dictionary<string, string>

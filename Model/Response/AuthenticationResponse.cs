@@ -1,5 +1,8 @@
 ﻿namespace worksheet2.Model.Response
 {
+    /**
+     * Response seen after authenticating the user
+     */
     public class AuthenticationResponse
     {
         public AuthenticationResponse(string firstName, string lastName, string userName, string token)
@@ -18,6 +21,8 @@
             AccountNumber = user.AccountNumber;
             Token = token;
             MiddleName = user.UserDetails.MiddleName;
+            Address = user.UserDetails.Address;
+            PhoneNumber = user.UserDetails.PhoneNumber;
         }
 
         public string FirstName { get; set; }
@@ -28,5 +33,9 @@
 
         public string AccountNumber { get; set; }
         public string Token { get; set; }
+        
+        public string PhoneNumber { get; set; }
+        
+        public string Address { get; set; }
     }
 }

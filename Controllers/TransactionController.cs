@@ -17,6 +17,9 @@ namespace worksheet2.Controllers
             _transactionService = transactionService;
         }
 
+        /**
+         * Endpoint to view transactions
+         */
         [HttpGet("view")]
         [Authorize]
         public IActionResult ViewTransaction()

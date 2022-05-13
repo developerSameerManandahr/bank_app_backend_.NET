@@ -69,7 +69,7 @@ namespace worksheet2.Services.Impl
         {
             var userFromContext = _userRepository.GetUserByAccountNumber(request.AccountNumber);
 
-            if (userFromContext != null && GetFullName(userFromContext).Equals(request.FullName))
+            if (userFromContext != null && Helper.Helper.GetFullName(userFromContext).Equals(request.FullName))
             {
                 return new BaseResponse("Details correct", "Success");
             }
@@ -106,6 +106,33 @@ namespace worksheet2.Services.Impl
             return new AuthenticationResponse(user, token);
         }
 
+        public BaseResponse ChangePin(ChangePinRequest request, User user)
+        {
+            if (!Crypto.VerifyHashedPassword(user.Pin, request.OldPin))
+            {
+                return new BaseResponse("The provided pin is incorrect", "Error");
+            }
+
+            user.Pin = Crypto.HashPassword(request.NewPin);
+            _userRepository.Update(user);
+            return new BaseResponse("Pin changed successfully", "Success");
+        }
+
+        public BaseResponse ChangePassword(ChangePasswordRequest request, User user)
+        {
+            if (!Crypto.VerifyHashedPassword(user.Password, request.OldPassword))
+            {
+                return new BaseResponse("The provided password is incorrect", "Error");
+            }
+
+            user.Password = Crypto.HashPassword(request.NewPassword);
+            _userRepository.Update(user);
+            return new BaseResponse("Password changed successfully", "Success");
+        }
+
+        /**
+         * Creates the account details object and creates the entry in database
+         */
         private void CreateAccountDetails(User createdUser, AccountType accountType)
         {
             var accountDetails = new AccountDetails
@@ -119,6 +146,9 @@ namespace worksheet2.Services.Impl
         }
 
 
+        /**
+         * Creates the jwt token that is used to authenticate the request
+         */
         private string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -134,24 +164,22 @@ namespace worksheet2.Services.Impl
             return tokenHandler.WriteToken(token);
         }
 
+        /**
+         * Generates the account number
+         * verifies its not duplicate entry
+         */
         private string GenerateAccount(int length)
         {
             var random = new Random();
             var accountNumber = string.Empty;
             for (var i = 0; i < length; i++)
                 accountNumber = string.Concat(accountNumber, random.Next(10).ToString());
+            
+            //Check if the random account number is already in database
             var user = _userRepository.GetUserByAccountNumber(accountNumber);
             if (user == null)
                 return accountNumber;
             return GenerateAccount(length);
-        }
-
-        private static string GetFullName(User user)
-        {
-            var middleName = user.UserDetails.MiddleName is {Length: > 0}
-                ? user.UserDetails.MiddleName + " "
-                : user.UserDetails.MiddleName;
-            return user.UserDetails.FirstName + " " + middleName + user.UserDetails.LastName;
         }
     }
 }

@@ -6,6 +6,9 @@ namespace worksheet2.Services
 {
     public interface IAccountDetailsService
     {
+        /**
+         * Used to Get account details by user id
+         */
         IEnumerable<AccountDetailsResponse> GetAccountDetailsResponsesById(User user);
     }
 }

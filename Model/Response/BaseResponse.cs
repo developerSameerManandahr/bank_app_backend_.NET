@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Response
 {
+    /**
+     * Base response for many API's
+     */
     public class BaseResponse
     {
 

@@ -2,6 +2,9 @@
 
 namespace worksheet2.Model.Request
 {
+    /**
+     * Model required while signup
+     */
     public class SignupRequest
     {
         [Required] [MinLength(4)] public string Username { get; set; }

@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace worksheet2.Model
 {
+    /**
+     * Entity class to store transactions
+     */
     public class Transaction
     {
         [Key] public string UserTransactionId { get; set; }
