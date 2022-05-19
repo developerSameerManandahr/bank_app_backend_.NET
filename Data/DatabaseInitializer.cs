@@ -39,9 +39,9 @@ namespace worksheet2.Data
             var userDetails = new UserDetails
             {
                 User = user,
-                FirstName = "Ussop",
-                LastName = "God",
-                MiddleName = "sogeking",
+                FirstName = "Main",
+                LastName = "User",
+                MiddleName = "Admin",
                 UserUserDetailsId = "1",
                 Address = "Home",
                 PhoneNumber = "1111111111"
